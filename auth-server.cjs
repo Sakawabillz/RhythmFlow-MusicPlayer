@@ -1,4 +1,57 @@
+
+const fetch = require('node-fetch');
+const express = require('express');
+const cors = require('cors');
+const fs = require('fs');
+const bcrypt = require('bcryptjs');
+const path = require('path');
+const jwt = require('jsonwebtoken');
+
+const app = express();
+const PORT = 5000;
+const USERS_FILE = path.join(__dirname, 'users.json');
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 const PLAYLISTS_FILE = path.join(__dirname, 'playlists.json');
+
+app.use(cors());
+app.use(express.json());
+
+// Proxy Deezer search
+app.get('/api/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.status(400).json({ error: 'Missing query parameter' });
+  try {
+    const response = await fetch(`https://api.deezer.com/search?q=${encodeURIComponent(q)}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch from Deezer' });
+  }
+});
+
+// Proxy Deezer track details
+app.get('/api/track/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await fetch(`https://api.deezer.com/track/${id}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch track from Deezer' });
+  }
+});
+
+// Proxy Deezer album details
+app.get('/api/album/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await fetch(`https://api.deezer.com/album/${id}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch album from Deezer' });
+  }
+});
 
 // Helper: Load playlists from file
 function loadPlaylists() {
@@ -10,6 +63,7 @@ function loadPlaylists() {
 function savePlaylists(playlists) {
   fs.writeFileSync(PLAYLISTS_FILE, JSON.stringify(playlists, null, 2));
 }
+
 // Get user's playlists/favorites
 app.get('/api/playlists', authenticateToken, (req, res) => {
   const playlists = loadPlaylists();
@@ -29,22 +83,6 @@ app.post('/api/playlists', authenticateToken, (req, res) => {
   savePlaylists(playlists);
   res.json({ success: true });
 });
-
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const bcrypt = require('bcryptjs');
-const path = require('path');
-const jwt = require('jsonwebtoken');
-
-
-const app = express();
-const PORT = 5000;
-const USERS_FILE = path.join(__dirname, 'users.json');
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
-
-app.use(cors());
-app.use(express.json());
 
 // Helper: Load users from file
 function loadUsers() {

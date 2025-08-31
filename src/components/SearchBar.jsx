@@ -5,10 +5,18 @@ export default function SearchBar({ onSearch }) {
   const [query, setQuery] = useState("");
   const [listening, setListening] = useState(false);
 
+
+  // Remove any trailing :id or extra tokens from query
+  const sanitizeQuery = (q) => {
+    // Only keep the part before a colon, if present
+    return q.split(':')[0].trim();
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (query.trim()) {
-      onSearch(query);
+    const clean = sanitizeQuery(query);
+    if (clean) {
+      onSearch(clean);
     }
   };
 
@@ -29,7 +37,7 @@ export default function SearchBar({ onSearch }) {
       const transcript = event.results[0][0].transcript;
       setQuery(transcript);
       setListening(false);
-      onSearch(transcript);
+      onSearch(sanitizeQuery(transcript));
     };
     recognition.onerror = () => {
       setListening(false);

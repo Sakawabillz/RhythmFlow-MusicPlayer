@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: rhythmflow
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: JWT_SECRET
+        value: your-secret-key-here
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
