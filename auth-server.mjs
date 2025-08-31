@@ -1,13 +1,17 @@
 
-const fetch = require('node-fetch');
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const bcrypt = require('bcryptjs');
-const path = require('path');
-const jwt = require('jsonwebtoken');
+import fetch from 'node-fetch';
+import express from 'express';
+import cors from 'cors';
+import fs from 'fs';
+import bcrypt from 'bcryptjs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import jwt from 'jsonwebtoken';
 
-const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export const app = express();
 const PORT = 5000;
 const USERS_FILE = path.join(__dirname, 'users.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
@@ -137,6 +141,4 @@ function authenticateToken(req, res, next) {
 }
 
 
-app.listen(PORT, () => {
-  console.log(`Auth server running on http://localhost:${PORT}`);
-});
+// Server is now started from server.js
