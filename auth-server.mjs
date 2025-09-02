@@ -17,19 +17,85 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 const PLAYLISTS_FILE = path.join(__dirname, 'playlists.json');
 
-app.use(cors());
+// Configure CORS
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',  // Local development
+    'https://rhythmflow-musicplayer-3.onrender.com'  // Production frontend URL
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Middleware to log requests
+app.use((req, res, next) => {
+  const start = Date.now();
+  const { method, url, headers, query, body } = req;
+  
+  console.log(`\n=== Incoming Request ===`);
+  console.log(`${method} ${url}`);
+  console.log('Headers:', JSON.stringify(headers, null, 2));
+  if (Object.keys(query).length > 0) {
+    console.log('Query:', JSON.stringify(query, null, 2));
+  }
+  if (body && Object.keys(body).length > 0) {
+    console.log('Body:', JSON.stringify(body, null, 2));
+  }
+  
+  // Log response finish
+  const originalEnd = res.end;
+  res.end = function(chunk, encoding) {
+    const duration = Date.now() - start;
+    console.log(`\n=== Response (${duration}ms) ===`);
+    console.log(`Status: ${res.statusCode}`);
+    if (chunk) {
+      try {
+        const isJson = res.getHeader('content-type')?.includes('application/json');
+        console.log('Body:', isJson ? JSON.stringify(JSON.parse(chunk.toString()), null, 2) : chunk.toString());
+      } catch (e) {
+        console.log('Body: [binary or unparsable data]');
+      }
+    }
+    originalEnd.call(this, chunk, encoding);
+  };
+  
+  next();
+});
 
 // Proxy Deezer search
 app.get('/api/search', async (req, res) => {
+  console.log('Search request received:', req.query);
   const { q } = req.query;
   if (!q) return res.status(400).json({ error: 'Missing query parameter' });
   try {
-    const response = await fetch(`https://api.deezer.com/search?q=${encodeURIComponent(q)}`);
+    const deezerUrl = `https://api.deezer.com/search?q=${encodeURIComponent(q)}`;
+    console.log('Fetching from Deezer:', deezerUrl);
+    const response = await fetch(deezerUrl);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Deezer API error:', response.status, errorText);
+      return res.status(response.status).json({ 
+        error: 'Failed to fetch from Deezer',
+        status: response.status,
+        details: errorText
+      });
+    }
+    
     const data = await response.json();
+    console.log('Deezer response:', { resultCount: data?.data?.length || 0 });
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch from Deezer' });
+    console.error('Search error:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch from Deezer',
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 

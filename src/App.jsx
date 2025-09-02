@@ -40,14 +40,14 @@ function RegisterForm() {
     }
   };
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-md mx-auto mt-10 flex flex-col gap-4">
-      <h2 className="text-2xl font-bold mb-2 text-green-300">Register</h2>
-      <input type="email" placeholder="Email" className="px-4 py-2 rounded text-black" value={email} onChange={e => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" className="px-4 py-2 rounded text-black" value={password} onChange={e => setPassword(e.target.value)} />
-      <input type="password" placeholder="Confirm Password" className="px-4 py-2 rounded text-black" value={confirm} onChange={e => setConfirm(e.target.value)} />
-  {error && <div className="text-red-400 text-sm">{error}</div>}
-  {success && <div className="text-green-400 text-sm">{success}</div>}
-      <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded transition">Register</button>
+    <form onSubmit={handleSubmit} className="bg-black/50 p-8 rounded-xl shadow-lg max-w-md mx-auto mt-10 flex flex-col gap-4 border border-[#008000]/50">
+      <h2 className="text-2xl font-bold mb-2 text-white">Register</h2>
+      <input type="email" placeholder="Email" className="px-4 py-2 rounded bg-black/30 text-white border border-[#008000]/50 focus:border-[#008000] focus:outline-none" value={email} onChange={e => setEmail(e.target.value)} />
+      <input type="password" placeholder="Password" className="px-4 py-2 rounded bg-black/30 text-white border border-[#008000]/50 focus:border-[#008000] focus:outline-none" value={password} onChange={e => setPassword(e.target.value)} />
+      <input type="password" placeholder="Confirm Password" className="px-4 py-2 rounded bg-black/30 text-white border border-[#008000]/50 focus:border-[#008000] focus:outline-none" value={confirm} onChange={e => setConfirm(e.target.value)} />
+      {error && <div className="text-red-400 text-sm">{error}</div>}
+      {success && <div className="text-green-400 text-sm">{success}</div>}
+      <button type="submit" className="bg-[#008000] hover:bg-[#006400] text-white font-bold py-2 rounded transition">Register</button>
     </form>
   );
 }
@@ -85,13 +85,13 @@ function LoginForm() {
     }
   };
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-md mx-auto mt-10 flex flex-col gap-4">
-      <h2 className="text-2xl font-bold mb-2 text-green-300">Login</h2>
-      <input type="email" placeholder="Email" className="px-4 py-2 rounded text-black" value={email} onChange={e => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" className="px-4 py-2 rounded text-black" value={password} onChange={e => setPassword(e.target.value)} />
-  {error && <div className="text-red-400 text-sm">{error}</div>}
-  {success && <div className="text-green-400 text-sm">{success}</div>}
-      <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded transition">Login</button>
+    <form onSubmit={handleSubmit} className="bg-black/50 p-8 rounded-xl shadow-lg max-w-md mx-auto mt-10 flex flex-col gap-4 border border-[#008000]/50">
+      <h2 className="text-2xl font-bold mb-2 text-white">Login</h2>
+      <input type="email" placeholder="Email" className="px-4 py-2 rounded bg-black/30 text-white border border-[#008000]/50 focus:border-[#008000] focus:outline-none" value={email} onChange={e => setEmail(e.target.value)} />
+      <input type="password" placeholder="Password" className="px-4 py-2 rounded bg-black/30 text-white border border-[#008000]/50 focus:border-[#008000] focus:outline-none" value={password} onChange={e => setPassword(e.target.value)} />
+      {error && <div className="text-red-400 text-sm">{error}</div>}
+      {success && <div className="text-green-400 text-sm">{success}</div>}
+      <button type="submit" className="bg-[#008000] hover:bg-[#006400] text-white font-bold py-2 rounded transition">Login</button>
     </form>
   );
 }
@@ -100,7 +100,7 @@ const TABS = ["Register", "Login", "Explore as Guest", "My Playlists"];
 
 function Footer() {
   return (
-    <footer className="mt-12 py-4 text-center text-green-300 bg-gray-900 bg-opacity-80 rounded-t-lg">
+    <footer className="mt-12 py-4 text-center text-white/80 bg-black/50 border-t border-[#008000]/30">
       &copy; {new Date().getFullYear()} Rhythm Flow. All rights reserved.
     </footer>
   );
@@ -194,7 +194,10 @@ export default function App() {
 
   const searchMusic = async (query) => {
     try {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       const data = await res.json();
       if (data && data.data) {
         setTracks(data.data);
@@ -203,20 +206,21 @@ export default function App() {
       }
     } catch (error) {
       console.error("Error fetching music:", error);
+      setTracks([]);
     }
   };
 
   return (
-    <div className={(darkMode ? "dark " : "") + "min-h-screen bg-gradient-to-br from-green-900 via-gray-900 to-black text-white flex flex-col"}>
-      <header className="mb-8 py-6 bg-gradient-to-r from-green-800 to-gray-900 rounded-b-2xl shadow-lg flex flex-col items-center">
+    <div className={(darkMode ? "dark " : "") + "min-h-screen bg-gradient-to-br from-[#008000] to-[#000000] text-white flex flex-col"}>
+      <header className="mb-8 py-6 bg-gradient-to-r from-[#008000] to-[#000000] shadow-lg flex flex-col items-center">
         <div className="flex w-full justify-between items-center max-w-6xl mx-auto">
-          <h1 className="text-4xl font-extrabold text-center text-green-300 drop-shadow-lg">🎵 Rhythm Flow</h1>
+          <h1 className="text-4xl font-extrabold text-center text-white drop-shadow-lg">🎵 Rhythm Flow</h1>
           <button
             onClick={() => setDarkMode((d) => !d)}
-            className="ml-4 px-4 py-2 rounded-full border border-green-400 bg-gray-900 text-green-300 hover:bg-green-700 hover:text-white transition"
+            className="ml-4 px-4 py-2 rounded-full border border-white bg-[#008000] text-white hover:bg-[#006400] transition"
             title="Toggle dark mode"
           >
-            {darkMode ? "🌙 Dark" : "☀️ Light"}
+            {darkMode ? "🌙" : "☀️"}
           </button>
         </div>
         <div className="flex justify-center gap-4 mt-6">
@@ -224,10 +228,10 @@ export default function App() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-6 py-2 rounded-full font-semibold transition border-2 border-green-400/50 ${
+              className={`px-6 py-2 rounded-full font-semibold transition border-2 border-white/50 ${
                 activeTab === tab
-                  ? "bg-green-600 text-white border-green-400 shadow-lg"
-                  : "bg-gray-800 text-green-300 hover:bg-green-700 hover:text-white"
+                  ? "bg-[#008000] text-white border-white shadow-lg"
+                  : "bg-transparent text-white/80 hover:bg-[#008000]/50"
               }`}
             >
               {tab}
@@ -245,34 +249,18 @@ export default function App() {
             <section className="mb-10">
               <SearchBar onSearch={searchMusic} />
               <h2 className="text-xl font-bold text-green-300 mb-4 mt-8">Recently Added</h2>
-              <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
                 {tracks.length > 0 ? (
                   tracks.map((track) => (
-                    <div key={track.id} className="relative">
-                      <TrackCard track={track} />
-                      {isLoggedIn && (
-                        <button
-                          onClick={() => addToPlaylist(track)}
-                          className="absolute top-2 right-2 bg-green-700 text-white px-2 py-1 rounded text-xs hover:bg-green-800"
-                        >
-                          + Playlist
-                        </button>
-                      )}
-                    </div>
+                    <TrackCard 
+                      key={track.id} 
+                      track={track} 
+                      onAddToPlaylist={addToPlaylist}
+                    />
                   ))
                 ) : (
-                  <p className="text-gray-400 text-center col-span-full">No results</p>
+                  <p className="text-white/70 col-span-full text-center py-8">No tracks found. Try searching for music!</p>
                 )}
-              </div>
-            </section>
-            <section className="mb-10">
-              <h2 className="text-xl font-bold text-green-300 mb-4">Music Genre Categories</h2>
-              <div className="flex flex-wrap gap-4 justify-center">
-                {['Pop', 'Hip-Hop', 'Rock', 'Afrobeat', 'Jazz', 'Classical', 'EDM', 'R&B', 'Reggae'].map((genre) => (
-                  <span key={genre} className="px-5 py-2 bg-green-800 text-green-200 rounded-full font-semibold shadow hover:bg-green-600 cursor-pointer">
-                    {genre}
-                  </span>
-                ))}
               </div>
             </section>
           </>
@@ -280,8 +268,8 @@ export default function App() {
 
         {activeTab === "My Playlists" && isLoggedIn && (
           <section className="mb-10">
-            <h2 className="text-2xl font-bold text-green-300 mb-4">My Playlist</h2>
-            {playlistStatus && <div className="text-green-400 mb-2">{playlistStatus}</div>}
+            <h2 className="text-2xl font-bold text-[#008000] mb-4">My Playlist</h2>
+            {playlistStatus && <div className="text-[#008000] mb-2">{playlistStatus}</div>}
             {playlists.length === 0 ? (
               <p className="text-gray-400">No tracks in your playlist yet.</p>
             ) : (
